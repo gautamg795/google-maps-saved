@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Google Maps Saved export",
+  "version": "0.1.0",
+  "description": "Export your Google Maps Saved lists as Takeout-format CSV/ZIP or JSON.",
+  "minimum_chrome_version": "127",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq9/EWLGQeeSeiVScROq7Kqim67Lls4itDxOKEYlZVHhDsHWMdMJQR95AzEVbc0RQHZx39E1mUoJw0x9Uvzc2+4xFuWG3H5611oyfdCEd+S4CZItuCYURSAiVdF4CaMwgojP4ODwK05OJHCaGpPz3ClexVpKprRThINzJTR8ZW5BLKDvI9LV13KLVOvPmFpnRrPI75xKZ8TBHO3PNCx/xbEFreYFeIafaBwki7ACHOQ1kFoNxhN0mKIG6+SLO0H1Be7ZszleUXRYfkxnuNHcQoQz0rexSbTUHqbH58jZ7HHkc1wxAEWbRUpxfWyHYrQlVDeNPINm2DP8RrFTmjTXuZQIDAQAB",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "optional_host_permissions": [
+    "https://www.google.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Export Google Maps Saved lists"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}
