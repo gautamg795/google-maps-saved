@@ -1,0 +1,20 @@
+{
+  "name": "google-maps-saved-workspace",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "npm run build -w google-maps-saved && npm run build -w @google-maps-saved/extension",
+    "typecheck": "tsc --noEmit -p packages/core/tsconfig.json && tsc --noEmit -p packages/extension/tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.3.5",
+    "esbuild": "0.27.0",
+    "jsdom": "^26.1.0",
+    "jszip": "^3.10.1",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.18"
+  }
+}

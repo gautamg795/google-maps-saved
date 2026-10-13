@@ -1,0 +1,27 @@
+{
+  "name": "google-maps-saved",
+  "version": "0.1.0",
+  "description": "Read Google Maps Saved lists through the signed-in Maps web session and export them as Takeout-format CSV/ZIP or JSON",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gautamg795/google-maps-saved.git",
+    "directory": "packages/core"
+  },
+  "keywords": ["google-maps", "saved-places", "takeout", "export", "chrome-extension"]
+}
