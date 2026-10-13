@@ -1,0 +1,130 @@
+{
+  "format": "google-maps-saved",
+  "schemaVersion": 1,
+  "adapterRevision": "maps-web-20261011.1",
+  "captureId": "capture-0001",
+  "startedAt": "2026-01-01T00:00:00.000Z",
+  "finishedAt": "2026-01-01T00:00:05.000Z",
+  "googleAccountId": "100000000000000000001",
+  "inventoryComplete": true,
+  "requestedGroups": [
+    "owned"
+  ],
+  "inventory": [
+    {
+      "key": "1:SampleWantToGo01",
+      "id": "SampleWantToGo01",
+      "type": 1,
+      "ownerAccountId": "100000000000000000001",
+      "relationship": "owned",
+      "title": "Want to go",
+      "description": "",
+      "emoji": "",
+      "visibility": "private",
+      "reportedCount": 3,
+      "modifiedMarker": null
+    },
+    {
+      "key": "3:SampleCoffee02",
+      "id": "SampleCoffee02",
+      "type": 3,
+      "ownerAccountId": "100000000000000000001",
+      "relationship": "owned",
+      "title": "Coffee: Best / Worst?",
+      "description": "",
+      "emoji": "",
+      "visibility": "private",
+      "reportedCount": 1,
+      "modifiedMarker": null
+    }
+  ],
+  "selectedListKeys": [
+    "1:SampleWantToGo01",
+    "3:SampleCoffee02"
+  ],
+  "lists": [
+    {
+      "key": "1:SampleWantToGo01",
+      "reportedCount": 3,
+      "retrievedCount": 3,
+      "complete": true
+    },
+    {
+      "key": "3:SampleCoffee02",
+      "reportedCount": 1,
+      "retrievedCount": 1,
+      "complete": true
+    }
+  ],
+  "memberships": [
+    {
+      "listKey": "1:SampleWantToGo01",
+      "identity": "0x60188bea7ea6ed0b:0x8ff7fbdfd0b3f59b",
+      "identityKind": "feature",
+      "featureParts": [
+        "6924438266345614603",
+        "-8072706868340591205"
+      ],
+      "featureId": "0x60188bea7ea6ed0b:0x8ff7fbdfd0b3f59b",
+      "cid": "10374037205368960411",
+      "name": "Example Fish Market",
+      "note": "Go early.\nTry the \"tamagoyaki\", then coffee.",
+      "address": "1 Example Street, Sample City",
+      "latitude": 35.6655,
+      "longitude": 139.7707,
+      "mapsUrl": "https://www.google.com/maps?cid=10374037205368960411",
+      "position": 0
+    },
+    {
+      "listKey": "1:SampleWantToGo01",
+      "identity": "coordinate:f99f0a2aa68e7f8e954a4f42105228a2daa189c27a2e38224893fd1b5c9cd616",
+      "identityKind": "coordinate",
+      "featureParts": null,
+      "featureId": null,
+      "cid": null,
+      "name": "Dropped pin",
+      "note": "",
+      "address": "",
+      "latitude": 35.6586,
+      "longitude": 139.7454,
+      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=35.6586,139.7454",
+      "position": 1
+    },
+    {
+      "listKey": "1:SampleWantToGo01",
+      "identity": "0x1234567890abcdef:0xfedcba0987654321",
+      "identityKind": "feature",
+      "featureParts": [
+        "1311768467294899695",
+        "-81986143110479071"
+      ],
+      "featureId": "0x1234567890abcdef:0xfedcba0987654321",
+      "cid": "18364757930599072545",
+      "name": "テスト喫茶 / Test Café, Annex?",
+      "note": " leading space",
+      "address": "",
+      "latitude": null,
+      "longitude": null,
+      "mapsUrl": "https://www.google.com/maps?cid=18364757930599072545",
+      "position": 2
+    },
+    {
+      "listKey": "3:SampleCoffee02",
+      "identity": "0x0:0x151997f33fb2aa27",
+      "identityKind": "feature",
+      "featureParts": [
+        "0",
+        "1520413420215773735"
+      ],
+      "featureId": "0x0:0x151997f33fb2aa27",
+      "cid": "1520413420215773735",
+      "name": "Placeholder Roasters",
+      "note": "",
+      "address": "2 Fake Avenue",
+      "latitude": 52.52,
+      "longitude": 13.405,
+      "mapsUrl": "https://www.google.com/maps?cid=1520413420215773735",
+      "position": 0
+    }
+  ]
+}
