@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Google Maps Saved</title>
+    <link rel="stylesheet" href="popup.css" />
+    <script type="module" src="popup.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>Google Maps Saved</h1>
+
+      <section id="not-maps" hidden>
+        <p>Open Google Maps, then click the toolbar icon again from that tab.</p>
+        <button type="button" id="open-maps">Open Google Maps</button>
+      </section>
+
+      <section id="access" hidden>
+        <p>
+          To read your Saved lists, this popup needs access to www.google.com
+          with your Google sign-in.
+        </p>
+        <button type="button" id="allow-access">Allow Google access</button>
+      </section>
+
+      <form id="export-form" hidden>
+        <label>
+          Google account
+          <select id="account"></select>
+        </label>
+
+        <fieldset>
+          <legend>Lists</legend>
+          <label class="check-row">
+            <input type="checkbox" id="include-followed" />
+            Include followed lists
+          </label>
+          <div id="lists" class="lists"></div>
+          <button type="button" id="reload" class="text-button" hidden>
+            Reload lists
+          </button>
+        </fieldset>
+
+        <fieldset>
+          <legend>File</legend>
+          <label class="check-row">
+            <input type="radio" name="format" value="zip" checked />
+            Takeout ZIP
+          </label>
+          <label class="check-row">
+            <input type="radio" name="format" value="json" />
+            JSON snapshot
+          </label>
+          <label class="check-row">
+            <input type="checkbox" id="extended" checked />
+            Add Latitude, Longitude, Address columns
+          </label>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" id="export">Export selected lists</button>
+          <button type="button" id="cancel" class="secondary" hidden>
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      <p id="status" aria-live="polite"></p>
+
+      <footer>
+        <p class="small">
+          Keep this popup open until the download starts. Google cookies stay
+          in Chrome; nothing is uploaded.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
