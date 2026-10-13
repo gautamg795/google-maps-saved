@@ -9,7 +9,7 @@ This repository has two packages:
 | Package | What it is |
 | --- | --- |
 | [`packages/core`](packages/core) | `google-maps-saved` on npm. The reader for Google's Maps web endpoints, the snapshot types and validator, and the Takeout CSV/ZIP serializer. Zero runtime dependencies. |
-| [`packages/extension`](packages/extension) | A Chrome extension (Manifest V3) that uses the library to export your lists to a file. A build option lets a [connected web app](#connected-web-apps) request the export. |
+| [`packages/extension`](packages/extension) | A Chrome extension (Manifest V3) that uses the library to export your lists to a file. A [connected web app](#connected-web-apps) listed in `app-origins.json` can request the export directly. |
 
 Google credentials stay in Chrome. Nothing is uploaded anywhere. The reader
 calls the same `www.google.com` endpoints the Maps web app calls, with your
@@ -48,21 +48,31 @@ are read by default; followed lists are optional.
 
 ## Connected web apps
 
-A web app can ask the extension for an export without the popup. Build the
-extension with the exact origins of that app:
+A web app can ask the extension for an export without the popup. The build
+reads the allowed app origins from `packages/extension/app-origins.json`, so
+plain `npm run build` produces the connected build. Chrome requires this list
+in the manifest; there is no way to add an origin at runtime.
 
-```sh
-npm run build -w @google-maps-saved/extension -- \
-  '--app-origins=https://places.example.com,http://localhost:3000'
-```
-
-Each value must be an exact `http` or `https` origin (scheme, host, and port
-only, no path or trailing slash). The build then adds a background service
-worker (`background.js`) and an `externally_connectable` entry to
+Each entry must be an exact `http` or `https` origin (scheme, host, and port
+only, no path or trailing slash). The build adds a background service worker
+(`background.js`) and an `externally_connectable` entry to
 `dist/manifest.json`. Chrome match patterns ignore the port, so the manifest
 lists `http://localhost/*` for `http://localhost:3000`. The worker accepts a
 connection only from a tab whose origin is exactly one of the configured
-origins. Without the flag, the build is popup-only.
+origins.
+
+Two overrides exist for one-off builds:
+
+```sh
+# Replace the list for this build only.
+npm run build -w @google-maps-saved/extension -- \
+  '--app-origins=https://places.example.com,http://localhost:3000'
+# Build with no connected apps.
+npm run build -w @google-maps-saved/extension -- --popup-only
+```
+
+The committed `app-origins.json` holds the maintainer's own app. Edit it, or
+empty it, before you distribute a build to other people.
 
 Use the popup once before the first connected export. The popup grants the
 `www.google.com` host permission and remembers the Google account that you
