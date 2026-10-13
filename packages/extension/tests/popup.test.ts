@@ -143,7 +143,10 @@ describe("popup", () => {
     ]);
     expect(select.value).toBe(ACCOUNT_ID);
     expect(readers[0]).toMatchObject({ slot: 1, followed: false, expectedAccountId: ACCOUNT_ID });
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({ lastAccountId: ACCOUNT_ID });
+    expect(chrome.storage.local.set).toHaveBeenCalledWith({
+      lastAccountId: ACCOUNT_ID,
+      lastAccountSlot: 1,
+    });
     expect(listBoxes().map((box) => box.checked)).toEqual([true, true]);
     expect($("lists").textContent).toContain("3 entries · Owned");
 

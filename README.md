@@ -9,7 +9,7 @@ This repository has two packages:
 | Package | What it is |
 | --- | --- |
 | [`packages/core`](packages/core) | `google-maps-saved` on npm. The reader for Google's Maps web endpoints, the snapshot types and validator, and the Takeout CSV/ZIP serializer. Zero runtime dependencies. |
-| [`packages/extension`](packages/extension) | A popup-only Chrome extension (Manifest V3) that uses the library to export your lists to a file. |
+| [`packages/extension`](packages/extension) | A Chrome extension (Manifest V3) that uses the library to export your lists to a file. A build option lets a [connected web app](#connected-web-apps) request the export. |
 
 Google credentials stay in Chrome. Nothing is uploaded anywhere. The reader
 calls the same `www.google.com` endpoints the Maps web app calls, with your
@@ -45,6 +45,59 @@ off in the popup if an importer rejects unknown columns.
 
 Starred places and My Maps are not included. Owned and collaborative lists
 are read by default; followed lists are optional.
+
+## Connected web apps
+
+A web app can ask the extension for an export without the popup. Build the
+extension with the exact origins of that app:
+
+```sh
+npm run build -w @google-maps-saved/extension -- \
+  '--app-origins=https://places.example.com,http://localhost:3000'
+```
+
+Each value must be an exact `http` or `https` origin (scheme, host, and port
+only, no path or trailing slash). The build then adds a background service
+worker (`background.js`) and an `externally_connectable` entry to
+`dist/manifest.json`. Chrome match patterns ignore the port, so the manifest
+lists `http://localhost/*` for `http://localhost:3000`. The worker accepts a
+connection only from a tab whose origin is exactly one of the configured
+origins. Without the flag, the build is popup-only.
+
+Use the popup once before the first connected export. The popup grants the
+`www.google.com` host permission and remembers the Google account that you
+choose. The worker uses that account and reads every owned and collaborative
+list. It never reads followed lists. It uses the popup setting for the extra
+`Latitude,Longitude,Address` columns.
+
+The extension ID does not change between builds and machines, because the
+`key` in `manifest.json` sets it. Use that ID in the web app.
+
+### Message protocol
+
+The page opens a port with `chrome.runtime.connect` and sends one message:
+
+| From | Message | Fields |
+| --- | --- | --- |
+| Page | `EXPORT` | `{ kind: "EXPORT" }`. Send one per port. |
+| Extension | `PROGRESS` | `listsRead`, `totalLists`, `membershipsRead` |
+| Extension | `RESULT` | `fileName` (`google-maps-saved-YYYY-MM-DD.zip`), `mimeType` (`application/zip`), `base64` (the Takeout ZIP), `lists`, `entries` |
+| Extension | `ERROR` | `code`, `message`. The `message` is for the user. |
+
+Error codes include `setup` (use the popup first), `empty` (no Saved lists),
+`account_mismatch` (choose the account in the popup again), `protocol` (the
+page sent an unknown message), `unexpected`, and the `MapsError` codes of the
+library. Close the port to cancel the read.
+
+```ts
+const port = chrome.runtime.connect(EXTENSION_ID, { name: "google-maps-saved-export" });
+port.onMessage.addListener((m) => { /* PROGRESS | RESULT | ERROR */ });
+port.postMessage({ kind: "EXPORT" });
+```
+
+`chrome.runtime` exists on a page only when an installed extension lists the
+origin of that page in `externally_connectable`. Check for it before you show
+the option.
 
 ## Use the library
 

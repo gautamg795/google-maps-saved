@@ -279,7 +279,10 @@ export class PopupController {
     const signal = this.begin("inventory");
     this.showStatus(`Reading lists for ${account.googleEmail}…`);
     try {
-      await this.chrome.storage.local.set({ lastAccountId: account.googleAccountId });
+      await this.chrome.storage.local.set({
+        lastAccountId: account.googleAccountId,
+        lastAccountSlot: account.slot,
+      });
       const result = await this.createReader({
         slot: account.slot,
         followed,
