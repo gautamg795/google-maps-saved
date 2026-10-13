@@ -35,7 +35,6 @@ function fakePort(sender: ExternalPort["sender"]) {
     port,
     posted,
     send: (message: unknown) => messageListeners.forEach((listener) => listener(message)),
-    /** Disconnects from the page side. */
     close: () => {
       open = false;
       disconnectListeners.forEach((listener) => listener());
@@ -152,10 +151,19 @@ describe("handleExternalPort", () => {
     expect(d.createReader).not.toHaveBeenCalled();
   });
 
+  it("answers HELLO without starting an export", () => {
+    const d = deps();
+    const { port, posted, send } = fakePort({ origin: APP_ORIGIN, tab: {} });
+    handleExternalPort(port, d);
+    send({ kind: "HELLO" });
+    expect(posted).toEqual([{ kind: "HELLO" }]);
+    expect(d.createReader).not.toHaveBeenCalled();
+  });
+
   it("rejects a message that is not an export request", () => {
     const { port, posted, send } = fakePort({ origin: APP_ORIGIN, tab: {} });
     handleExternalPort(port, deps());
-    send({ kind: "HELLO" });
+    send({ kind: "PING" });
     expect(posted).toEqual([expect.objectContaining({ kind: "ERROR", code: "protocol" })]);
   });
 
@@ -244,7 +252,6 @@ describe("handleExternalPort", () => {
       signal = options.signal;
       return new Promise<Snapshot>((_resolve, reject) => {
         options.signal.addEventListener("abort", () => {
-          // Progress after the disconnect must not reach the closed port.
           options.progress?.({ listsRead: 0, totalLists: 2, membershipsRead: 0 });
           settled = true;
           reject(new MapsError("cancelled", "The read was cancelled."));

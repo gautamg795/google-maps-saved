@@ -13,7 +13,8 @@ export type ServiceMessage =
       lists: number;
       entries: number;
     }
-  | { kind: "ERROR"; code: string; message: string };
+  | { kind: "ERROR"; code: string; message: string }
+  | { kind: "HELLO" };
 
 /** The part of `chrome.runtime.Port` that the service uses. */
 export interface ExternalPort {
@@ -46,12 +47,12 @@ const ACCOUNT_MOVED =
 const UNEXPECTED =
   "The export failed. Open the Google Maps Saved extension on a Google Maps tab and try an export there.";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 function isExportRequest(message: unknown): boolean {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    (message as { kind?: unknown }).kind === "EXPORT"
-  );
+  return isRecord(message) && message.kind === "EXPORT";
 }
 
 function isSlot(value: unknown): value is number {
@@ -59,7 +60,7 @@ function isSlot(value: unknown): value is number {
 }
 
 /** Returns standard base64 for `bytes`. */
-export function toBase64(bytes: Uint8Array): string {
+function toBase64(bytes: Uint8Array): string {
   // String.fromCharCode takes each byte as one argument. Large chunks
   // overflow the call stack.
   const chunk = 0x8000;
@@ -96,6 +97,13 @@ export function handleExternalPort(port: ExternalPort, deps: ExportServiceDeps):
     abort.abort();
   });
   port.onMessage.addListener((message) => {
+    // HELLO lets a page confirm that this exact origin is accepted. Chrome
+    // exposes chrome.runtime on every port of a listed host, so the page
+    // cannot know that from chrome.runtime alone.
+    if (isRecord(message) && message.kind === "HELLO") {
+      post({ kind: "HELLO" });
+      return;
+    }
     if (!isExportRequest(message)) {
       post({ kind: "ERROR", code: "protocol", message: 'Send { kind: "EXPORT" }.' });
       return;
