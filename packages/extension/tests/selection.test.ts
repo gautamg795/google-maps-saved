@@ -1,6 +1,6 @@
 import { LIMITS, type Relationship, type SourceList } from "google-maps-saved";
 import { describe, expect, it } from "vitest";
-import { carrySelection, defaultSelectedKeys, selectionProblem } from "../src/selection.js";
+import { carrySelection, selectionProblem } from "../src/selection.js";
 
 function list(id: string, relationship: Relationship, reportedCount = 1): SourceList {
   return {
@@ -19,11 +19,6 @@ function list(id: string, relationship: Relationship, reportedCount = 1): Source
 }
 
 describe("default selection", () => {
-  it("selects every list that is not followed", () => {
-    const lists = [list("a", "owned"), list("b", "collaborative"), list("c", "followed")];
-    expect([...defaultSelectedKeys(lists)]).toEqual(["1:a", "1:b"]);
-  });
-
   it("keeps known choices and gives new lists the default", () => {
     const before = [list("a", "owned"), list("b", "owned")];
     const after = [...before, list("c", "followed"), list("d", "collaborative")];

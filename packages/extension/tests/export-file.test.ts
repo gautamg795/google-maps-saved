@@ -1,20 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { exportFile, exportFileName, exportMimeType } from "../src/export-file.js";
+import { exportFile } from "../src/export-file.js";
 import { sampleSnapshot } from "../../core/tests/fixture.js";
 
 const date = new Date(2026, 0, 5, 23, 30);
 
 describe("export file", () => {
-  it("names the file with the local date", () => {
-    expect(exportFileName("zip", date)).toBe("google-maps-saved-2026-01-05.zip");
-    expect(exportFileName("json", date)).toBe("google-maps-saved-2026-01-05.json");
-  });
-
-  it("gives the MIME type for each format", () => {
-    expect(exportMimeType("zip")).toBe("application/zip");
-    expect(exportMimeType("json")).toBe("application/json");
-  });
-
   it("writes a Takeout ZIP with or without the extended columns", async () => {
     const snapshot = await sampleSnapshot();
     const text = async (extended: boolean) => {

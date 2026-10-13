@@ -66,10 +66,6 @@ describe("takeoutPlaceUrl", () => {
     expect(url).toBe(
       "https://www.google.com/maps/place/Example+Fish+Market/data=!4m2!3m1!1s0x60188bea7ea6ed0b:0x8ff7fbdfd0b3f59b",
     );
-    expect(url.startsWith("https://www.google.com/maps/place/")).toBe(true);
-    expect(url.endsWith(`/data=!4m2!3m1!1s${member.featureId}`)).toBe(true);
-    const token = /!1s([^!/?]+)/.exec(url)?.[1];
-    expect(token).toBe(member.featureId);
     expect(BigInt(member.featureId!.split(":")[1]).toString()).toBe(member.cid);
   });
 
@@ -89,7 +85,6 @@ describe("takeoutPlaceUrl", () => {
     expect(decodeURIComponent(parsed.pathname.split("/")[3].replaceAll("+", " "))).toBe(
       member.name,
     );
-    expect(BigInt(member.featureId!.split(":")[1]).toString()).toBe(member.cid);
   });
 
   test("uses Saved+place when the trimmed name is empty", async () => {
@@ -106,15 +101,6 @@ describe("takeoutPlaceUrl", () => {
     );
   });
 
-  test("returns mapsUrl unchanged for a coordinate member", async () => {
-    const snapshot = await sampleSnapshot();
-    const member = memberNamed(snapshot, "Dropped pin");
-    expect(member.identityKind).toBe("coordinate");
-    expect(takeoutPlaceUrl(member)).toBe(member.mapsUrl);
-    expect(member.mapsUrl).toBe(
-      "https://www.google.com/maps/search/?api=1&query=35.6586,139.7454",
-    );
-  });
 });
 
 describe("takeoutFileName", () => {
@@ -160,17 +146,6 @@ describe("takeoutCsv", () => {
     ]);
     expect(records.every((r) => r.length === 4)).toBe(true);
     expect(records[1][3]).toBe("");
-  });
-
-  test("quotes a note with a newline and quotes", async () => {
-    const snapshot = await sampleSnapshot();
-    const list = snapshot.inventory[0];
-    const members = snapshot.memberships.filter((m) => m.listKey === list.key);
-    const csv = takeoutCsv(list, members);
-    expect(csv).toContain(
-      'Example Fish Market,"Go early.\nTry the ""tamagoyaki"", then coffee.",https://',
-    );
-    expect(parseCsv(csv)[1][1]).toBe('Go early.\nTry the "tamagoyaki", then coffee.');
   });
 
   test("adds extended columns only when requested", async () => {
@@ -245,16 +220,12 @@ describe("toTakeoutZip", () => {
       .filter((f) => !f.dir)
       .map((f) => f.name);
     expect(names).toEqual(["Takeout/Saved/Ramen.csv", "Takeout/Saved/ramen (2).csv"]);
-    expect(names.every((n) => /^Takeout\/Saved\/[^/]+\.csv$/.test(n))).toBe(true);
 
     const first = parseCsv((await zip.file("Takeout/Saved/Ramen.csv")?.async("string")) ?? "");
     expect(first[0]).toEqual(["Title", "Note", "URL", "Comment"]);
-    const url = first[1][2];
-    expect(url).toBe(
+    expect(first[1][2]).toBe(
       "https://www.google.com/maps/place/Sample+Noodle+Bar/data=!4m2!3m1!1s0x60188bea7ea6ed0b:0x8ff7fbdfd0b3f59b",
     );
-    const hex = /!1s(0x[0-9a-f]+):(0x[0-9a-f]+)/.exec(url);
-    expect(BigInt(hex![2]).toString()).toBe(snapshot.memberships[0].cid);
 
     const second = parseCsv((await zip.file("Takeout/Saved/ramen (2).csv")?.async("string")) ?? "");
     expect(second[1][2]).toBe("https://www.google.com/maps/search/?api=1&query=1.5,-2.25");

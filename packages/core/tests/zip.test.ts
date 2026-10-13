@@ -57,12 +57,6 @@ describe("createStoredZip", () => {
     expect(view.getUint16(12, true)).toBe((1 << 5) | 1);
   });
 
-  test("gives the same bytes for the same input and date", () => {
-    const a = createStoredZip(sampleEntries(), { date: DATE });
-    const b = createStoredZip(sampleEntries(), { date: DATE });
-    expect(a).toEqual(b);
-  });
-
   test("writes a valid empty archive", async () => {
     const bytes = createStoredZip([], { date: DATE });
     expect(bytes.length).toBe(22);

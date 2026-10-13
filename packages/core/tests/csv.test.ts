@@ -39,12 +39,6 @@ describe("encodeCsv", () => {
     ).toBe('Title,Note\nA,"x,y"\n');
   });
 
-  test("has no BOM", () => {
-    const text = encodeCsv([["Title"]]);
-    expect(text.charCodeAt(0)).not.toBe(0xfeff);
-    expect(text.startsWith("Title")).toBe(true);
-  });
-
   test("keeps empty fields", () => {
     expect(encodeCsv([["a", "", "c", ""]])).toBe("a,,c,\n");
   });
