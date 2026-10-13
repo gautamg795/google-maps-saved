@@ -12,16 +12,32 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "prepublishOnly": "npm run typecheck && npm run build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gautamg795/google-maps-saved.git",
     "directory": "packages/core"
   },
-  "keywords": ["google-maps", "saved-places", "takeout", "export", "chrome-extension"]
+  "homepage": "https://github.com/gautamg795/google-maps-saved#readme",
+  "bugs": {
+    "url": "https://github.com/gautamg795/google-maps-saved/issues"
+  },
+  "keywords": [
+    "google-maps",
+    "saved-places",
+    "takeout",
+    "export",
+    "chrome-extension"
+  ]
 }
