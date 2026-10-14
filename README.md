@@ -169,8 +169,9 @@ const snapshot = await reader.collect(); // every owned and collaborative list
 const zip = toTakeoutZip(snapshot, { extended: true });
 ```
 
-The API is documented in [`packages/core/README.md`](packages/core/README.md).
-The package is not yet published to npm.
+The API is documented in [`packages/core/README.md`](packages/core/README.md)
+and the package is on npm at
+[google-maps-saved](https://www.npmjs.com/package/google-maps-saved).
 
 ## Develop
 
