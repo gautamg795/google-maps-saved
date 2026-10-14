@@ -148,6 +148,32 @@ accepted. An unlisted origin is disconnected without a reply.
 | Chrome refuses to load the unpacked folder | Another copy with the same ID is loaded. Remove it first. |
 | "Google returned a response this connector cannot decode." | Google changed the response layout. Open an issue with the message. |
 
+## Publish to the Chrome Web Store
+
+The store build is popup-only and has no `key`, so the store assigns its own
+extension ID and a sideloaded connected build can stay installed next to it.
+
+```sh
+npm run build:store
+```
+
+This writes `packages/extension/dist-store/` and
+`packages/extension/google-maps-saved-extension-<version>.zip`. Then, in the
+[Developer Dashboard](https://chrome.google.com/webstore/devconsole):
+
+1. Register as a developer once (one-time fee) with the Google account that
+   should own the listing.
+2. **New item**, upload the ZIP.
+3. Fill **Store listing**, **Privacy practices**, and **Distribution** from
+   [`store/listing.md`](store/listing.md). Upload the screenshots and promo
+   tile from `store/`.
+4. Submit for review. Review takes from hours to a few days. Permissions and
+   the privacy form are the usual reasons for a rejection; the text in
+   `store/listing.md` answers them.
+
+For a new version: bump `version` in `packages/extension/manifest.json`, run
+`npm run build:store`, upload the new ZIP under **Package**, and submit.
+
 ## Use the library
 
 ```sh
