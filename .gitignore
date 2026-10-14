@@ -1,4 +1,6 @@
 node_modules/
 dist/
+dist-store/
+packages/extension/google-maps-saved-extension-*.zip
 *.tsbuildinfo
 .DS_Store

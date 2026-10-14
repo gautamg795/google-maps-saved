@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "build": "npm run build -w google-maps-saved && npm run build -w @google-maps-saved/extension",
+    "build:store": "npm run build -w google-maps-saved && npm run build:store -w @google-maps-saved/extension",
     "typecheck": "tsc --noEmit -p packages/core/tsconfig.json && tsc --noEmit -p packages/extension/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest"

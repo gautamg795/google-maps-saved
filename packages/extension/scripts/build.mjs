@@ -8,6 +8,12 @@
 // --app-origins=<origin>[,<origin>...] replaces that list for one build;
 // --popup-only builds without connected apps. A popup-only build must be
 // identical to a build with an empty list.
+//
+// --store builds the Chrome Web Store package: popup-only, into dist-store/,
+// with no manifest `key`, then zipped to google-maps-saved-extension-<version>.zip.
+// Keep `key` in the other builds; it sets the sideloaded extension ID.
+// Requires the `zip` command.
+import { execFileSync } from "node:child_process";
 import { copyFile, cp, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,7 +21,6 @@ import { build } from "esbuild";
 
 const extensionDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sourceDir = join(extensionDir, "src");
-const outDir = join(extensionDir, "dist");
 const tempDir = join(extensionDir, `.dist-tmp-${process.pid}`);
 const coreEntry = resolve(extensionDir, "..", "core", "src", "index.ts");
 
@@ -48,39 +53,45 @@ function checkOrigins(origins, source) {
 }
 
 /**
- * Returns the connected web app origins for this build, or null for a
- * popup-only build. Order of precedence: --popup-only, --app-origins=,
+ * Returns `{ store, appOrigins }`. `appOrigins` is null for a popup-only
+ * build. Order of precedence: --store, --popup-only, --app-origins=,
  * app-origins.json, none.
  */
-async function resolveAppOrigins(args) {
+async function resolveMode(args) {
   let override = null;
   let popupOnly = false;
+  let store = false;
   for (const arg of args) {
     if (arg === "--popup-only") {
       popupOnly = true;
+    } else if (arg === "--store") {
+      store = true;
     } else if (arg.startsWith("--app-origins=")) {
       if (override !== null) throw new Error("Give --app-origins one time only.");
       override = checkOrigins(arg.slice("--app-origins=".length).split(","), "--app-origins");
     } else {
       throw new Error(
-        `Unknown argument ${JSON.stringify(arg)}. Use --app-origins=<origin>[,<origin>...] or --popup-only.`,
+        `Unknown argument ${JSON.stringify(arg)}. Use --app-origins=<origin>[,<origin>...], --popup-only, or --store.`,
       );
     }
+  }
+  if (store && override !== null) {
+    throw new Error("--store and --app-origins cannot be combined. A store build is popup-only.");
   }
   if (popupOnly && override !== null) {
     throw new Error("--popup-only and --app-origins cannot be combined.");
   }
-  if (popupOnly) return null;
-  if (override !== null) return override;
+  if (store || popupOnly) return { store, appOrigins: null };
+  if (override !== null) return { store, appOrigins: override };
   let text;
   try {
     text = await readFile(originsFile, "utf8");
   } catch (error) {
-    if (error.code === "ENOENT") return null;
+    if (error.code === "ENOENT") return { store, appOrigins: null };
     throw error;
   }
   const origins = checkOrigins(JSON.parse(text), "app-origins.json");
-  return origins.length === 0 ? null : origins;
+  return { store, appOrigins: origins.length === 0 ? null : origins };
 }
 
 /**
@@ -99,8 +110,23 @@ function matchPatterns(origins) {
   ];
 }
 
+/** Replaces `zipPath` with an archive of the files in `dir`, at the archive root. */
+function zipDirectory(dir, zipPath) {
+  try {
+    // -X leaves out extra file attributes. zip -r adds to an existing archive,
+    // so the caller must remove it first.
+    execFileSync("zip", ["-q", "-r", "-X", zipPath, "."], { cwd: dir, stdio: "inherit" });
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      throw new Error("The zip command is not installed. Install zip, then run the store build again.");
+    }
+    throw error;
+  }
+}
+
 async function main() {
-  const appOrigins = await resolveAppOrigins(process.argv.slice(2));
+  const { store, appOrigins } = await resolveMode(process.argv.slice(2));
+  const outDir = join(extensionDir, store ? "dist-store" : "dist");
   await rm(tempDir, { recursive: true, force: true });
   await mkdir(tempDir, { recursive: true });
   try {
@@ -111,7 +137,11 @@ async function main() {
       }
     }
     await cp(join(extensionDir, "public"), join(tempDir, "public"), { recursive: true });
-    if (appOrigins === null) {
+    if (store) {
+      const manifest = JSON.parse(await readFile(join(extensionDir, "manifest.json"), "utf8"));
+      delete manifest.key;
+      await writeFile(join(tempDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+    } else if (appOrigins === null) {
       await copyFile(join(extensionDir, "manifest.json"), join(tempDir, "manifest.json"));
     } else {
       await build({
@@ -126,13 +156,20 @@ async function main() {
     }
     await rm(outDir, { recursive: true, force: true });
     await rename(tempDir, outDir);
-    console.log(`Built extension at ${outDir}`);
-    if (appOrigins !== null) {
-      console.log(`Connected web app origins: ${appOrigins.join(", ")}`);
-    }
   } catch (error) {
     await rm(tempDir, { recursive: true, force: true });
     throw error;
+  }
+  console.log(`Built extension at ${outDir}`);
+  if (appOrigins !== null) {
+    console.log(`Connected web app origins: ${appOrigins.join(", ")}`);
+  }
+  if (store) {
+    const { version } = JSON.parse(await readFile(join(outDir, "manifest.json"), "utf8"));
+    const zipPath = join(extensionDir, `google-maps-saved-extension-${version}.zip`);
+    await rm(zipPath, { force: true });
+    zipDirectory(outDir, zipPath);
+    console.log(`Packed store upload at ${zipPath}`);
   }
 }
 

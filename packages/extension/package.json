@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:store": "node scripts/build.mjs --store",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
